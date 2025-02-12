@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from typing import Optional
 
 app = FastAPI(
@@ -8,35 +8,32 @@ app = FastAPI(
 )
 
 usuarios = [
-    {"id": 1, "nombre": "Ivan", "edad": 37},
-    {"id": 2, "nombre": "Carlos", "edad": 15},
-    {"id": 3, "nombre": "María", "edad": 18},
-    {"id": 4, "nombre": "Lucía", "edad": 37},
+    {"id": 1, "nombre": "Alonso", "edad": 20},
+    {"id": 2, "nombre": "Elvira", "edad": 20},
+    {"id": 3, "nombre": "Fernanda", "edad": 20},
+    {"id": 4, "nombre": "Alma", "edad": 20},
 ]
 
-# Endpoint home
-@app.get("/", tags=["Hola Mundo"])
-def home():
-    return {"hello": "world FastAPI"}
+# Endpoint CONSULTA TODOS
+@app.get("/todosUsuarios", tags=["Operaciones CRUD"])
+def leerUsuarios():
+    return{"Los usuarios registrados son":   usuarios}
 
-# Endpoint de promedio
-@app.get("/promedio", tags=["Operaciones"])
-def promedio():
-    return {"promedio": 8.2}
 
-# Endpoint con parámetro obligatorio en la URL
-@app.get("/usuario/{id}", tags=["Parámetro Obligatorio"])
-def consulta_usuario(id: int):
-    for usuario in usuarios:
-        if usuario["id"] == id:
-            return {"mensaje": "Usuario encontrado", "usuario": usuario}
-    return {"mensaje": f"Usuario con id {id} no encontrado"}
+#Endpoint Agregar nuevos
+@app.post('/usuario/', tags=['Operaciones CRUD'])
+def agregarUsuario(usuario:dict):
+    for usr in usuarios:
+        if usr["id"] == usuario.get("id"):
+            raise HTTPException(status_code=400, detail="el ID ya esta en uso ")
+    usuarios.append(usuario)        
+    return usuario
 
-@app.get("/usuario", tags=["Parámetro Opcional"])
-def consulta_usuario2(id: Optional[int] = None):
-    if id is not None:
-        for usuario in usuarios:
-            if usuario["id"] == id:
-                return {"mensaje": "Usuario encontrado", "usuario": usuario}
-        return {"mensaje": f"Usuario con id {id} no encontrado"}
-    return {"mensaje": "No se proporcionó un id"}
+#Endpoint actualizar usuraios(put)
+@app.put('/usuarios/{id}', tags=['Operaciones CRUD'])
+def actualizar(id:int, usuarioActualizado:dict):
+    for index, usr in enumerate(usuarios):
+        if usr["id"] == id:
+            usuarios[index].update(usuarioActualizado)
+            return usuarios[index]
+    raise HTTPException(status_code=400, detail="El usuario no existe") 
