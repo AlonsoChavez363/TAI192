@@ -28,7 +28,7 @@ def listarTareas():
     return{"Las tareas pendientes son": tareas}
 
 #endpoint para obtener tareas especificas por id
-@app.get('/usuarios/{id}', tags=['Gestianr Tareas'])
+@app.get('/ListarTareas/{id}', tags=['Gestionar Tareas'])
 def actualizar(id:int):
     for index, usr in enumerate(tareas):
         if usr["id"] == id:
@@ -37,6 +37,13 @@ def actualizar(id:int):
     
 
 #endpoint para crear tarea
+@app.post('/tareas/', tags=['Agregar Tareas'])
+def agregarTarea(tarea:dict):
+    for usr in tareas:
+        if usr["id"] == tarea.get("id"):
+            raise HTTPException(status_code=400, detail="el ID ya esta en uso ")
+    tareas.append(tarea)        
+    return tarea
 
 #endpoint para actualizar una tarea existente
 
