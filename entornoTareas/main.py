@@ -37,7 +37,7 @@ def actualizar(id:int):
     
 
 #endpoint para crear tarea
-@app.post('/tareas/', tags=['Agregar Tareas'])
+@app.post('/tareasPost/', tags=['Agregar Tareas'])
 def agregarTarea(tarea:dict):
     for usr in tareas:
         if usr["id"] == tarea.get("id"):
@@ -46,5 +46,12 @@ def agregarTarea(tarea:dict):
     return tarea
 
 #endpoint para actualizar una tarea existente
+@app.put('/tareasUpdate/{id}', tags=['Actualizar Tarea'])
+def actualizar(id:int, tareaActualizado:dict):
+    for index, usr in enumerate(tareas):
+        if usr["id"] == id:
+            tareas[index].update(tareaActualizado)
+            return tareas[index]
+    raise HTTPException(status_code=400, detail="La tarea no existe")
 
 #endpoint para eliminar una tarea existente
