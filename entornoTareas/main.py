@@ -28,11 +28,12 @@ def listarTareas():
     return{"Las tareas pendientes son": tareas}
 
 #endpoint para obtener tareas especificas por id
-@app.get('/ListarTareas/{id}', tags=["Gestionar Tareas"])
-def listarTareas(id: int):
-    if tareas["id"]==id:
-        return {"La tarea encontrada es ": tareas}
-    raise HTTPException(status_code=404, detail="No existe la tarea con ese id")
+@app.get('/usuarios/{id}', tags=['Gestianr Tareas'])
+def actualizar(id:int):
+    for index, usr in enumerate(tareas):
+        if usr["id"] == id:
+            return tareas[index]
+    raise HTTPException(status_code=400, detail="La tarea no existe") 
     
 
 #endpoint para crear tarea
