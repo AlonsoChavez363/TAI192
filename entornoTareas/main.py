@@ -55,3 +55,10 @@ def actualizar(id:int, tareaActualizado:dict):
     raise HTTPException(status_code=400, detail="La tarea no existe")
 
 #endpoint para eliminar una tarea existente
+@app.delete('/tareas/borrar', tags=['Eliminar Tarea'])
+def eliminar(id:int):
+    for index, usr in enumerate(tareas):
+        if usr["id"] == id:
+            del tareas[index]
+            return {'Tarea eliminada': tareas}
+    raise HTTPException(status_code=400, detail="La tarea no existe")
