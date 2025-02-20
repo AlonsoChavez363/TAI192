@@ -5,6 +5,8 @@ app = FastAPI(
     description="Alonso Chávez Alegria",
     version="1.0.2",
 )
+
+
 #crear nuestros registros
 tareas = [
     {"id": 1, "titulo": "Crear notas de clase", "descrpcion":"Crear notas de la clase con las diapositivas", "Vencimiento": "8-02-2025", "estado": "Finalizado" },
