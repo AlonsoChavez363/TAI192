@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from typing import Optional,List
-from pydantic import BaseModel
+from models import ModeloUsuario
 
 app = FastAPI(
     title="Mi Primer API 192",
@@ -8,13 +8,7 @@ app = FastAPI(
     version="1.0.1",
 )
 
-#clase
-class ModeloUsuario(BaseModel):
-    id: int
-    nombre :str
-    correo:str
-    edad:int
-    correo:str
+
 
 
 usuarios = [
@@ -27,25 +21,25 @@ usuarios = [
 # Endpoint CONSULTA TODOS
 @app.get("/todosUsuarios",response_model=List[ModeloUsuario], tags=["Operaciones CRUD"])
 def leerUsuarios():
-    return{"Los usuarios registrados son":   usuarios}
+    return usuarios
 
 
 
 #Endpoint Agregar nuevos
-@app.post('/usuario/', tags=['Operaciones CRUD'])
-def agregarUsuario(usuario:dict):
+@app.post('/usuario/', response_model= ModeloUsuario, tags=['Operaciones CRUD'])
+def agregarUsuario(usuario:ModeloUsuario):
     for usr in usuarios:
-        if usr["id"] == usuario.get("id"):
+        if usr["id"] == usuario.id:
             raise HTTPException(status_code=400, detail="el ID ya esta en uso ")
     usuarios.append(usuario)        
     return usuario
 
 #Endpoint actualizar usuraios(put)
-@app.put('/usuarios/{id}', tags=['Operaciones CRUD'])
-def actualizar(id:int, usuarioActualizado:dict):
+@app.put('/usuarios/{id}', response_model= ModeloUsuario, tags=['Operaciones CRUD'])
+def actualizar(id:int, usuarioActualizado:ModeloUsuario):
     for index, usr in enumerate(usuarios):
         if usr["id"] == id:
-            usuarios[index].update(usuarioActualizado)
+            usuarios[index]=usuarioActualizado.model_dump()
             return usuarios[index]
     raise HTTPException(status_code=400, detail="El usuario no existe") 
 
