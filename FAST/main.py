@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from typing import Optional,List
-from models import ModeloUsuario
+from modelsPydantic import ModeloUsuario, modeloAuth
+from genToken import createToken
 
 app = FastAPI(
     title="Mi Primer API 192",
@@ -17,6 +19,20 @@ usuarios = [
     {"id": 3, "nombre": "Ana", "edad": 20,"correo":"example@example.com"},
     {"id": 4, "nombre": "Fatima", "edad": 20,"correo":"example@example.com"},
 ]
+#Endpoint home
+@app.get('/', tags=['Hola Mundo'])
+def home():
+    return "Hola Mundo"
+
+#Endpoitn Autenticacion
+@app.post('/auth', tags=["Autentificacion"])
+def login(autorizacion:modeloAuth):
+    if autorizacion.correo == 'alonso@example.com' and autorizacion.passw == '123456789':
+        token:str = createToken(autorizacion.model_dump())
+        print(token)
+        return JSONResponse(token)
+    else:
+        return{"Usuario no registrado"}
 
 # Endpoint CONSULTA TODOS
 @app.get("/todosUsuarios",response_model=List[ModeloUsuario], tags=["Operaciones CRUD"])
