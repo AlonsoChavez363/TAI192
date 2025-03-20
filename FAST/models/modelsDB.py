@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String
 
 
 class User(Base):
-    _tablename_='tbUsers'
+    __tablename__='tbUsers'
     id= Column( Integer, primary_key= True, autoincrement= "auto")
     name= Column(String)
     age= Column(Integer)
