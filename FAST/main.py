@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from typing import Optional,List
 from modelsPydantic import ModeloUsuario, modeloAuth
 from genToken import createToken
@@ -39,9 +40,39 @@ def login(autorizacion:modeloAuth):
         return{"Usuario no registrado"}
 
 # Endpoint CONSULTA TODOS
-@app.get("/todosUsuarios", dependencies=[Depends(BearerJWT())],response_model=List[ModeloUsuario], tags=["Operaciones CRUD"])
+@app.get("/todosUsuarios", tags=["Operaciones CRUD"])
 def leerUsuarios():
-    return usuarios
+    db= session()
+    try:
+        consulta= db.query(User).all()
+        return JSONResponse(content= jsonable_encoder(consulta))
+
+    except Exception as e:
+        return JSONResponse(status_code=500,
+                            content={"message":"Error al consultar",
+                                     "Exception": str(e)} )
+    finally:
+        db.close()
+    
+
+#Endpoitn para buscar por id
+@app.get('/usuario/{id}', tags=["Operaciones CRUD"])
+def buscarUno(id:int):
+    db = session()
+    try: 
+        consultauno=db.query(User).filter(User.id == id).first()
+        if not consultauno:
+            return JSONResponse(status_code=404, content={"Mensaje":"Usuario no encontrado"})
+        return JSONResponse(content= jsonable_encoder(consultauno))
+    
+    except Exception as e:
+        return JSONResponse(status_code=500,
+                            content={"message":"Error al consultar",
+                                     "Exception": str(e)} )
+    
+    finally:
+        db.close()
+
 
 
 
