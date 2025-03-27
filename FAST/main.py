@@ -95,18 +95,45 @@ def agregarUsuario(usuario:ModeloUsuario):
     
 #Endpoint actualizar usuraios(put)
 @app.put('/usuarios/{id}', response_model= ModeloUsuario, tags=['Operaciones CRUD'])
-def actualizar(id:int, usuarioActualizado:ModeloUsuario):
-    for index, usr in enumerate(usuarios):
-        if usr["id"] == id:
-            usuarios[index]=usuarioActualizado.model_dump()
-            return usuarios[index]
-    raise HTTPException(status_code=400, detail="El usuario no existe") 
+def actualizar(id: int, usuarioActualizado: ModeloUsuario):
+    db = session()
+    try:
+        usuario = db.query(User).filter(User.id == id).first()
+        if not usuario:
+            return JSONResponse(status_code=404, content={"Mensaje": "Usuario no encontrado"})
+        
+        db.query(User).filter(User.id == id).update(usuarioActualizado.model_dump())
+        db.commit()
+        return JSONResponse(status_code=200, content={"Mensaje": "Usuario actualizado"})
+    
+    except Exception:
+        db.rollback()
+        return JSONResponse(status_code=500, content={"Mensaje": "Error al actualizar"})
+    
+    finally:
+        db.close()
 
 
-@app.delete('/usuarios/borrar', tags=['Operaciones Crud'])
-def eliminar(id:int):
-    for index, usr in enumerate(usuarios):
-        if usr["id"] == id:
-            del usuarios[index]
-            return {'Usuario eliminado': usuarios}
-    raise HTTPException(status_code=400, detail="El usuario no existe")
+
+
+#Endpont eliminar usuario(del)
+@app.delete('/usuarios/borrar/{id}', response_model = ModeloUsuario, tags=['Operaciones CRUD'])
+def eliminarUno(id:int):
+    db = session()
+    try: 
+        eliminaruno=db.query(User).filter(User.id == id).first()
+        if not eliminaruno:
+            return JSONResponse(status_code=404, content={"Mensaje":"Usuario no encontrado"})
+        else:
+            db.delete(eliminaruno)  
+            db.commit()
+            return JSONResponse(status_code=200, content={"Mensaje": "Usuario eliminado", "usuario": id})
+    
+    except Exception as e:
+        return JSONResponse(status_code=500,
+                            content={"Mensaje": "Error al consultar",
+                                    "Exception": str(e)})
+    
+    finally:
+        db.close()
+
